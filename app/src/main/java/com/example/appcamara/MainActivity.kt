@@ -4,15 +4,24 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import android.os.Environment
 import android.provider.MediaStore
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
 import com.example.appcamara.databinding.ActivityMainBinding
+import java.io.File
 
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var file : File
+    private var rutaFotoActual = ""
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding= ActivityMainBinding.inflate(layoutInflater)
@@ -33,15 +42,34 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun tomarfoto() {
-        abrircamara.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+        //abrircamara.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).also {
+            it.resolveActivity(packageManager).also {
+                component ->
+                crearArchivoFoto()
+                val fotoUri : Uri = FileProvider.getUriForFile(applicationContext, "com.example.appcamara.fileprovider", file)
+                it.putExtra(MediaStore.EXTRA_OUTPUT,fotoUri)
+            }
+        }
+        abrircamara.launch(intent)
     }
     private val abrircamara = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()){
             result ->
         if (result.resultCode== RESULT_OK){
-            val data = result.data!!
-            val imagenBitmap = data.extras!!.get("data") as Bitmap
-            binding.ivimage.setImageBitmap(imagenBitmap)
+            /*val data = result.data!!
+            val imagenBitmap = data.extras!!.get("data") as Bitmap*/
+            binding.ivimage.setImageBitmap(obtenerImagenBitmap())
         }
+    }
+
+    private fun crearArchivoFoto(){
+        val directorioImg = getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
+        file = File.createTempFile("IMG_${System.currentTimeMillis()}_", ".jpg", directorioImg)
+        rutaFotoActual = file.absolutePath
+    }
+
+    private fun obtenerImagenBitmap() : Bitmap{
+        return BitmapFactory.decodeFile(file.toString())
     }
 }
