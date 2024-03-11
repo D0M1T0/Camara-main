@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var file : File
-    private var rutaFotoActual = ""
+    private var rutaFotoActual = " "
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
