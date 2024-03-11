@@ -42,7 +42,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun tomarfoto() {
-        //abrircamara.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).also {
             it.resolveActivity(packageManager).also {
                 component ->
